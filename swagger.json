@@ -1,0 +1,236 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Car Management API",
+      "version": "1.0.0",
+      "description": "API documentation for the Car Management Application"
+    },
+    "paths": {
+      "/api/users/signup": {
+        "post": {
+          "summary": "Register a new user",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": { "type": "string" },
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["username", "email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "User registered successfully" },
+            "400": { "description": "User already exists" }
+          }
+        }
+      },
+      "/api/users/login": {
+        "post": {
+          "summary": "Log in a user",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login successful with JWT token",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "token": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "404": { "description": "User not found" },
+            "400": { "description": "Invalid credentials" }
+          }
+        }
+      },
+      "/api/cars": {
+        "post": {
+          "summary": "Create a new car",
+          "security": [{ "bearerAuth": [] }],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "tags": { "type": "array", "items": { "type": "string" } },
+                    "images": { "type": "array", "items": { "type": "string" } }
+                  },
+                  "required": ["title", "description"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": { "description": "Car created successfully" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "get": {
+          "summary": "Get all cars for the logged-in user",
+          "security": [{ "bearerAuth": [] }],
+          "responses": {
+            "200": {
+              "description": "List of cars",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Car" }
+                  }
+                }
+              }
+            },
+            "500": { "description": "Server error" }
+          }
+        }
+      },
+      "/api/cars/search": {
+        "get": {
+          "summary": "Search cars by keyword",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "keyword",
+              "in": "query",
+              "description": "Keyword to search in title, description, or tags",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Search results",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Car" }
+                  }
+                }
+              }
+            },
+            "500": { "description": "Server error" }
+          }
+        }
+      },
+      "/api/cars/{id}": {
+        "get": {
+          "summary": "Get a specific car by ID",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "Car details" },
+            "404": { "description": "Car not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "put": {
+          "summary": "Update a specific car by ID",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": { "type": "string" },
+                    "description": { "type": "string" },
+                    "tags": { "type": "array", "items": { "type": "string" } },
+                    "images": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": { "description": "Car updated successfully" },
+            "404": { "description": "Car not found" },
+            "500": { "description": "Server error" }
+          }
+        },
+        "delete": {
+          "summary": "Delete a specific car by ID",
+          "security": [{ "bearerAuth": [] }],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" }
+            }
+          ],
+          "responses": {
+            "200": { "description": "Car deleted successfully" },
+            "404": { "description": "Car not found" },
+            "500": { "description": "Server error" }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Car": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "tags": { "type": "array", "items": { "type": "string" } },
+            "images": { "type": "array", "items": { "type": "string" } },
+            "user": { "type": "string" },
+            "_id": { "type": "string" },
+            "createdAt": { "type": "string", "format": "date-time" },
+            "updatedAt": { "type": "string", "format": "date-time" }
+          }
+        }
+      },
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
+  
